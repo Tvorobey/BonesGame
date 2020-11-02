@@ -61,15 +61,31 @@ void GameController::onStartGame(int cellCount)
                 int prevPrevType    = m_model->data(m_model->index(i - 2, j)).toInt();
                 int prevType        = m_model->data(m_model->index(i - 1, j)).toInt();
 
+
+
                 if (prevPrevType == prevType)
                 {
                     while (true)
                     {
                        quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+
                        if (type != prevType)
                        {
-                           m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
-                           break;
+                           if (m_model->data(m_model->index(i, j -1)).isValid())
+                           {
+                               int prevRowType = m_model->data(m_model->index(i, j -1)).toInt();
+
+                               if (type != prevRowType)
+                               {
+                                   m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
+                                   break;
+                               }
+                           }
+                           else
+                           {
+                               m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
+                               break;
+                           }
                        }
                     }
                 }
@@ -85,26 +101,28 @@ void GameController::onStartGame(int cellCount)
 
 void GameController::onStoneSelected(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    m_selectedStone     = selected.indexes();
-    m_deselectedStone   = deselected.indexes();
+    QModelIndex selectedItem;
+    if (!selected.indexes().isEmpty()) selectedItem = selected.indexes().first();
+
+    QModelIndex targetItem;
+    if (!deselected.indexes().isEmpty()) targetItem   = deselected.indexes().first();
 
     // Проверяем был ли убран фокус с другой ячейки
-    if (!m_deselectedStone.isEmpty() && !m_selectedStone.isEmpty())
+    if (targetItem.isValid() && selectedItem.isValid())
     {
         // Проверим, что человеком была выбрана соседняя ячейка по вертикали или горизонтали
-        int rowDelta    = m_selectedStone.first().row() - m_deselectedStone.first().row();
-        int columnDelta = m_selectedStone.first().column() - m_deselectedStone.first().column();
+        int rowDelta    = selectedItem.row() - targetItem.row();
+        int columnDelta = selectedItem.column() - targetItem.column();
 
         if ((qAbs(rowDelta) < 2) && (qAbs(columnDelta) < 2))
         {
-            if (m_selectedStone.first().data().toInt() == m_deselectedStone.first().data().toInt())
+            if (selectedItem.data().toInt() == targetItem.data().toInt())
             {
                 emit clearSelection();
                 return;
             }
 
-            swapCells(m_selectedStone.first(), m_deselectedStone.first());
-
+            swapCells(selectedItem, targetItem);
         }
     }
 }
