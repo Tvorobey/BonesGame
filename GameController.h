@@ -20,6 +20,7 @@ signals:
 public slots:
     void onStartGame(int cellCount);
     void onStoneSelected(const QItemSelection &selected, const QItemSelection &deselected);
+    void swapCells(const QModelIndex& first, const QModelIndex& second);
 private:
     QSharedPointer<QStandardItemModel>  m_model;
     QModelIndexList                     m_selectedStone;
