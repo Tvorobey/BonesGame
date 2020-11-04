@@ -291,6 +291,16 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
     }
 }
 
+void GameController::dropDownStoned(const ColumnToDelete &columnToDelete, const RowToDelete &rowToDelete)
+{
+    //Сначала глянем, что у нас там под удаленным колонкам в строках
+    // Когда речь идет об удаленных колонках, мы всегда знаем
+    for (const auto& columnArray : columnToDelete)
+    {
+
+    }
+}
+
 
 
 
