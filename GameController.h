@@ -25,9 +25,10 @@ public slots:
     void onStartGame(int cellCount);
     void onStoneSelected(const QItemSelection &selected, const QItemSelection &deselected);
     void swapCells(const QModelIndex& first, const QModelIndex& second);
-    void checkScene(const QModelIndex &from = QModelIndex(),
+    void scanScene(const QModelIndex &from = QModelIndex(),
                     const QModelIndex &to = QModelIndex(),
                     bool clicked = true);
+    void deleteMatches(const ColumnToDelete& columnToDelete, const RowToDelete& rowToDelete);
 private:
     QSharedPointer<QStandardItemModel>  m_model;
 };

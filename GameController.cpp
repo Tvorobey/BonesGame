@@ -136,7 +136,7 @@ void GameController::onStoneSelected(const QItemSelection &selected, const QItem
 
             swapCells(fromIndex, toIndex);
 
-            checkScene(toIndex, fromIndex, true);
+            scanScene(toIndex, fromIndex, true);
 
             emit clearSelection();
 
@@ -155,7 +155,7 @@ void GameController::swapCells(const QModelIndex &first, const QModelIndex &seco
     m_model->setData(second, secondData);
 }
 
-void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, bool clicked)
+void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, bool clicked)
 {
     // Сканируем все поле, на нахождение трех или более фишек
     // Начинаем счетчики с 1, так как подсчет ведется из количества шариков
@@ -174,19 +174,21 @@ void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, 
             QModelIndex currentRowIndex = m_model->index(j, i);
             QModelIndex nextRowIndex = m_model->index(j + 1, i);
 
-            int currRowType = currentRowIndex.data().toInt();
+            bool isRowConvetOk = false;
+            int currRowType = currentRowIndex.data().toInt(&isRowConvetOk);
             int nextRowType = nextRowIndex.data().toInt();
 
 
             QModelIndex currentColumnIndex = m_model->index(i, j);
             QModelIndex nextColumnIndex = m_model->index(i, j + 1);
 
-            int currColumnType = currentColumnIndex.data().toInt();
+            bool isColumnConvertOk;
+            int currColumnType = currentColumnIndex.data().toInt(&isColumnConvertOk);
             int nextColumnType = nextColumnIndex.data().toInt();
 
             // Нашли что следующий шарик такой же, пометили колонку с которой это начинается
             // и прибавили число шариков, которые совпали
-            if (nextRowIndex.isValid())
+            if (nextRowIndex.isValid() && isRowConvetOk)
             {
                 if (currentRowIndex.data().toInt() == nextRowIndex.data().toInt())
                 {
@@ -211,7 +213,7 @@ void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, 
             }
 
 
-            if (nextColumnIndex.isValid())
+            if (nextColumnIndex.isValid() & isColumnConvertOk)
             {
                 if (currentColumnIndex.data().toInt() == nextColumnIndex.data().toInt())
                 {
@@ -237,6 +239,9 @@ void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, 
         }
     }
 
+    qDebug() << "Row to delete: " << rowToDelete;
+    qDebug() << "Column to delete: " << columnToDelete;
+
     if (clicked)
     {
         if (rowToDelete.isEmpty() && columnToDelete.isEmpty())
@@ -245,6 +250,43 @@ void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, 
             {
                 swapCells(from, to);
             });
+        }
+    }
+    else
+    {
+        // TODO: сделать проверку на то, что человек проиграл
+    }
+
+    deleteMatches(columnToDelete, rowToDelete);
+}
+
+void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const RowToDelete &rowToDelete)
+{
+    // Удалим шарики из колонок
+    for (const auto& columnArray : columnToDelete)
+    {
+        int start   = columnArray.second.first;
+        int end     = columnArray.second.second;
+
+        for (int i = start; i <= end; ++i)
+        {
+            QModelIndex index = m_model->index(columnArray.first, i);
+
+            m_model->setData(index, "");
+        }
+    }
+
+    // Удалим шарики из строк
+    for (const auto& rowArray : rowToDelete)
+    {
+        int start   = rowArray.second.first;
+        int end     = rowArray.second.second;
+
+        for (int i = start; i <= end; ++i)
+        {
+            QModelIndex index = m_model->index(i, rowArray.first);
+
+            m_model->setData(index, "");
         }
     }
 }
