@@ -134,12 +134,9 @@ void GameController::onStoneSelected(const QItemSelection &selected, const QItem
                 return;
             }
 
-            qDebug() << "From: " << fromIndex.column();
-            qDebug() << "To: " << toIndex.column();
-
             swapCells(fromIndex, toIndex);
 
-            checkScene(true);
+            checkScene(toIndex, fromIndex, true);
 
             emit clearSelection();
 
@@ -158,7 +155,7 @@ void GameController::swapCells(const QModelIndex &first, const QModelIndex &seco
     m_model->setData(second, secondData);
 }
 
-void GameController::checkScene(bool clicked)
+void GameController::checkScene(const QModelIndex& from, const QModelIndex& to, bool clicked)
 {
     // Сканируем все поле, на нахождение трех или более фишек
     // Начинаем счетчики с 1, так как подсчет ведется из количества шариков
@@ -240,8 +237,16 @@ void GameController::checkScene(bool clicked)
         }
     }
 
-    qDebug() << "Row to delete: " << rowToDelete;
-    qDebug() << "Column to delete: " << columnToDelete;
+    if (clicked)
+    {
+        if (rowToDelete.isEmpty() && columnToDelete.isEmpty())
+        {
+            QTimer::singleShot(REVERSE_SWAP_DELAY, [this, from, to]
+            {
+                swapCells(from, to);
+            });
+        }
+    }
 }
 
 
