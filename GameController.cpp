@@ -254,13 +254,21 @@ void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, b
                 swapCells(from, to);
             });
         }
+        else
+        {
+            if (rowToDelete.isEmpty() && columnToDelete.isEmpty())
+                return;
+
+            deleteMatches(columnToDelete, rowToDelete);
+        }
     }
     else
     {
         // TODO: сделать проверку на то, что человек проиграл
+        deleteMatches(columnToDelete, rowToDelete);
     }
 
-    deleteMatches(columnToDelete, rowToDelete);
+
 }
 
 void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const RowToDelete &rowToDelete)
@@ -324,6 +332,36 @@ void GameController::shuffleDown()
             }
         }
     }
+
+    QTimer::singleShot(500, [this]()
+    {
+       floodFill();
+    });
+}
+
+void GameController::floodFill()
+{
+    for (int column = 0; column < m_model->columnCount(); ++column)
+    {
+        for (int row = 0; row < m_model->rowCount(); ++row)
+        {
+            QModelIndex index = m_model->index(row, column);
+
+            bool isOk = false;
+            index.data().toInt(&isOk);
+
+            // Если в первой строке, есть шарик, значит и дальше есть шарики
+            if (isOk)  continue;
+            else
+            {
+                quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+
+                m_model->setData(index, type);
+            }
+        }
+    }
+
+    scanScene();
 }
 
 

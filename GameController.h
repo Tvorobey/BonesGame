@@ -30,6 +30,7 @@ public slots:
                     bool clicked = true);
     void deleteMatches(const ColumnToDelete& columnToDelete, const RowToDelete& rowToDelete);
     void shuffleDown();
+    void floodFill();
 private:
     QSharedPointer<QStandardItemModel>  m_model;
 };
