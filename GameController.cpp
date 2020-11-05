@@ -119,8 +119,13 @@ void GameController::onStoneSelected(const QItemSelection &selected, const QItem
     QModelIndex toIndex;
     if (!selected.indexes().isEmpty()) toIndex   = selected.indexes().first();
 
+    bool fromTypeOk = false;
+    bool toTypeOk = false;
+    fromIndex.data().toInt(&fromTypeOk);
+    toIndex.data().toInt(&toTypeOk);
+
     // Проверяем был ли убран фокус с другой ячейки
-    if (fromIndex.isValid() && toIndex.isValid())
+    if (fromIndex.isValid() && toIndex.isValid() && fromTypeOk && toTypeOk)
     {
         // Проверим, что человеком была выбрана соседняя ячейка по вертикали или горизонтали
         int rowDelta    = fromIndex.row() - toIndex.row();
@@ -175,16 +180,14 @@ void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, b
             QModelIndex nextRowIndex = m_model->index(j + 1, i);
 
             bool isRowConvetOk = false;
-            int currRowType = currentRowIndex.data().toInt(&isRowConvetOk);
-            int nextRowType = nextRowIndex.data().toInt();
+            currentRowIndex.data().toInt(&isRowConvetOk);
 
 
             QModelIndex currentColumnIndex = m_model->index(i, j);
             QModelIndex nextColumnIndex = m_model->index(i, j + 1);
 
             bool isColumnConvertOk;
-            int currColumnType = currentColumnIndex.data().toInt(&isColumnConvertOk);
-            int nextColumnType = nextColumnIndex.data().toInt();
+            currentColumnIndex.data().toInt(&isColumnConvertOk);
 
             // Нашли что следующий шарик такой же, пометили колонку с которой это начинается
             // и прибавили число шариков, которые совпали
@@ -289,15 +292,37 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
             m_model->setData(index, "");
         }
     }
+
+    shuffleDown();
 }
 
-void GameController::dropDownStoned(const ColumnToDelete &columnToDelete, const RowToDelete &rowToDelete)
+void GameController::shuffleDown()
 {
-    //Сначала глянем, что у нас там под удаленным колонкам в строках
-    // Когда речь идет об удаленных колонках, мы всегда знаем
-    for (const auto& columnArray : columnToDelete)
-    {
+    // Падение шариков вниз
 
+    for (int column = 0; column < m_model->columnCount(); ++column)
+    {
+        int fallDistance = 0;
+
+        for (int row = m_model->rowCount() - 1; row >=0; --row)
+        {
+            QModelIndex index = m_model->index(row, column);
+
+            bool isOk   = false;
+            index.data().toInt(&isOk);
+
+            if (!isOk) ++fallDistance;
+            else
+            {
+                if (fallDistance > 0)
+                {
+                    int type = index.data().toInt();
+
+                    m_model->setData(m_model->index(row + fallDistance, column), type);
+                    m_model->setData(index, "");
+                }
+            }
+        }
     }
 }
 
