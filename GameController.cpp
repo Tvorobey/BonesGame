@@ -43,7 +43,7 @@ void GameController::onStartGame(int cellCount)
         {
             if ((i < 2) && (j < 2))
             {
-                quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
                 m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
             }
 
@@ -56,7 +56,7 @@ void GameController::onStartGame(int cellCount)
                 {
                     while (true)
                     {
-                       quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                       int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
                        if (type != prevType)
                        {
                             m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
@@ -66,7 +66,7 @@ void GameController::onStartGame(int cellCount)
                 }
                 else
                 {
-                    quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                    int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
                     m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
                 }
             }
@@ -79,7 +79,7 @@ void GameController::onStartGame(int cellCount)
                 {
                     while (true)
                     {
-                       quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                       int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
 
                        if (type != prevType)
                        {
@@ -141,7 +141,7 @@ void GameController::onStoneSelected(const QItemSelection &selected, const QItem
 
             swapCells(fromIndex, toIndex);
 
-            scanScene(toIndex, fromIndex, true);
+            scanScene(true, toIndex, fromIndex);
 
             emit clearSelection();
 
@@ -160,7 +160,7 @@ void GameController::swapCells(const QModelIndex &first, const QModelIndex &seco
     m_model->setData(second, secondData);
 }
 
-void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, bool clicked)
+void GameController::scanScene(bool clicked, const QModelIndex& from, const QModelIndex& to)
 {
     // Сканируем все поле, на нахождение трех или более фишек
     // Начинаем счетчики с 1, так как подсчет ведется из количества шариков
@@ -245,6 +245,7 @@ void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, b
     qDebug() << "Row to delete: " << rowToDelete;
     qDebug() << "Column to delete: " << columnToDelete;
 
+    // Нажатие пользователя
     if (clicked)
     {
         if (rowToDelete.isEmpty() && columnToDelete.isEmpty())
@@ -256,15 +257,26 @@ void GameController::scanScene(const QModelIndex& from, const QModelIndex& to, b
         }
         else
         {
-            if (rowToDelete.isEmpty() && columnToDelete.isEmpty())
-                return;
-
             deleteMatches(columnToDelete, rowToDelete);
         }
     }
+    // Очистка совпадений после того, как заполнили поле
     else
     {
-        // TODO: сделать проверку на то, что человек проиграл
+        if (columnToDelete.isEmpty() && rowToDelete.isEmpty())
+        {
+            if (!victoryCheck())
+            {
+                qDebug() << "You loose";
+                return;
+            }
+            else
+            {
+                qDebug() << "Yeah go on!";
+                return;
+            }
+        }
+
         deleteMatches(columnToDelete, rowToDelete);
     }
 
@@ -362,7 +374,151 @@ void GameController::floodFill()
         }
     }
 
-    scanScene();
+    scanScene(false);
+}
+
+//NOTE: тут решение, вроде неплохое, но вот реализация непричесанная, в лоб так сказать
+bool GameController::victoryCheck()
+{
+    // NOTE: когда мы заходим в жту функцию, поле уже очищено от последовательностей шариков
+    // от трех и более
+    bool result = false;
+
+    // Пробежимся по строчкам и столбцам
+    for (int row = 0; row < m_model->rowCount(); ++row)
+    {
+        for (int column = 0; column < m_model->columnCount(); ++column)
+        {
+            int rowType = m_model->index(column, row).data().toInt();
+            int columnType = m_model->index(row, column).data().toInt();
+
+            // Два подряд идущих шара в строке
+            if (columnType == m_model->index(row, column + 1).data().toInt())
+            {
+                QModelIndex leftColumnIndex = m_model->index(row, column - 2);
+                QModelIndex leftTopIndex    = m_model->index(row - 1, column -1);
+                QModelIndex leftBottomIndex = m_model->index(row + 1, column -1);
+
+                QModelIndex rightColumnIndex = m_model->index(row, column + 3);
+                QModelIndex rightTopIndex = m_model->index(row - 1, column + 2);
+                QModelIndex rightBottomIndex = m_model->index(row + 1, column + 2);
+
+                if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (leftTopIndex.isValid() && (leftTopIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (leftBottomIndex.isValid() && (leftBottomIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+
+                if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (rightTopIndex.isValid() && (rightTopIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (rightBottomIndex.isValid() && (rightBottomIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+            }
+
+            // Два шарика, но которые идут через один в строке
+            if (columnType == m_model->index(row, column + 2).data().toInt())
+            {
+                QModelIndex topRowIndex = m_model->index(row - 1, column + 1);
+                QModelIndex bottomRowIndex = m_model->index(row + 1, column + 1);
+
+                if (topRowIndex.isValid() && (topRowIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == columnType))
+                {
+                    result = true;
+                    return result;
+                }
+            }
+
+            // Два шарика стоят подряд в колонке
+            if (rowType == m_model->index(column + 1, row).data().toInt())
+            {
+                QModelIndex topRowIndex = m_model->index(column - 2, row);
+                QModelIndex topLeftRowIndex = m_model->index(column - 1, row - 1);
+                QModelIndex topRightRowIndex = m_model->index(column - 1, row + 1);
+
+                QModelIndex bottomRowIndex = m_model->index(column + 3, row);
+                QModelIndex bottomLeftRowIndex = m_model->index(column + 2, row -1);
+                QModelIndex bottomRightIndex = m_model->index(column + 2, row +1);
+
+                if (topRowIndex.isValid() && (topRowIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (topLeftRowIndex.isValid() && (topLeftRowIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (topRightRowIndex.isValid() && (topRightRowIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+
+                if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (bottomLeftRowIndex.isValid() && (bottomLeftRowIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (bottomRightIndex.isValid() && (bottomRightIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+            }
+
+            // В колонке есть два одинаковых шарика, которые стоят через один
+            if (rowType == m_model->index(column, row + 2).data().toInt())
+            {
+                QModelIndex leftColumnIndex = m_model->index(column + 1, row - 1);
+                QModelIndex rightColumnIndex = m_model->index(column + 1, row + 1);
+
+                if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return result;
+                }
+                if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == rowType))
+                {
+                    result = true;
+                    return true;
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 

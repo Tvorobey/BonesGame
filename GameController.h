@@ -37,9 +37,9 @@ public slots:
      * \param to - ячейка, в которую пользователь выбрал свап
      * \param clicked - true - кликнул пользователь, false - мы сами заполнили поле
      */
-    void scanScene(const QModelIndex &from = QModelIndex(),
-                    const QModelIndex &to = QModelIndex(),
-                    bool clicked = true);
+    void scanScene( bool clicked = true,
+                    const QModelIndex &from = QModelIndex(),
+                    const QModelIndex &to = QModelIndex());
     /*!
      * \brief deleteMatches - удаление одинаковых шариков
      * \param columnToDelete - номер строки, (колнка от которой начать удалять, колонка до которой)
@@ -54,6 +54,7 @@ public slots:
      * \brief floodFill - заполнение пустых ячеек поля
      */
     void floodFill();
+    bool victoryCheck();
 private:
     QSharedPointer<QStandardItemModel>  m_model;
 };
