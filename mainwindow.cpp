@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     createConnection();
 
     ui->setupUi(this);
+    ui->ScoreLable->setText("Лучший счет: 0");
     ui->gameSceneView->setItemDelegate(new StoneDelegat());
 
     ui->gridLayout->addWidget(popup, 0, 0, 0, Qt::AlignCenter);
@@ -40,6 +41,11 @@ void MainWindow::setModel(QSharedPointer<QStandardItemModel> model)
 void MainWindow::clearSelections()
 {
     m_selectionModel->clearSelection();
+}
+
+void MainWindow::updateScore(int score)
+{
+    ui->ScoreLable->setText(QString("Лучший счет: %1").arg(score));
 }
 
 void MainWindow::createConnection()

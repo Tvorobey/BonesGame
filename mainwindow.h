@@ -25,6 +25,7 @@ signals:
     void stoneSelected(const QItemSelection &selected, const QItemSelection &deselected);
 public slots:
     void clearSelections();
+    void updateScore(int score);
 private:
     void createConnection();
 private:

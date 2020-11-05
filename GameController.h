@@ -21,6 +21,7 @@ public:
     void setModel(QSharedPointer<QStandardItemModel> model);
 signals:
     void clearSelection();
+    void updateScore(int score);
 public slots:
     void onStartGame(int cellCount);
     /*!
@@ -57,6 +58,7 @@ public slots:
     bool victoryCheck();
 private:
     QSharedPointer<QStandardItemModel>  m_model;
+    int m_score;
 };
 
 #endif // GAMECONTROLLER_H

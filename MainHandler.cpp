@@ -25,4 +25,7 @@ MainHandler::MainHandler(QObject *parent)
 
     connect(m_gameController.data(), &GameController::clearSelection,
             m_mainWindow.data(), &MainWindow::clearSelections);
+
+    connect(m_gameController.data(), &GameController::updateScore,
+            m_mainWindow.data(), &MainWindow::updateScore);
 }

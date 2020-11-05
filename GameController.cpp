@@ -22,10 +22,10 @@ namespace
     };
 }
 
-GameController::GameController(QObject *parent) : QObject(parent)
-{
-
-}
+GameController::GameController(QObject *parent)
+    : QObject(parent),
+      m_score(0)
+{}
 
 void GameController::setModel(QSharedPointer<QStandardItemModel> model)
 {
@@ -34,6 +34,8 @@ void GameController::setModel(QSharedPointer<QStandardItemModel> model)
 
 void GameController::onStartGame(int cellCount)
 {
+    m_score = 0;
+
     m_model->setRowCount(cellCount);
     m_model->setColumnCount(cellCount);
 
@@ -279,8 +281,6 @@ void GameController::scanScene(bool clicked, const QModelIndex& from, const QMod
 
         deleteMatches(columnToDelete, rowToDelete);
     }
-
-
 }
 
 void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const RowToDelete &rowToDelete)
@@ -290,6 +290,8 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
     {
         int start   = columnArray.second.first;
         int end     = columnArray.second.second;
+
+        m_score += (end + 1) - start;
 
         for (int i = start; i <= end; ++i)
         {
@@ -305,6 +307,8 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
         int start   = rowArray.second.first;
         int end     = rowArray.second.second;
 
+        m_score += (end + 1) - start;
+
         for (int i = start; i <= end; ++i)
         {
             QModelIndex index = m_model->index(i, rowArray.first);
@@ -312,6 +316,8 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
             m_model->setData(index, "");
         }
     }
+
+    emit updateScore(m_score);
 
     // Дропнем все шарики вниз
     shuffleDown();
