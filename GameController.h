@@ -23,13 +23,36 @@ signals:
     void clearSelection();
 public slots:
     void onStartGame(int cellCount);
+    /*!
+     * \brief onStoneSelected - при выборе шарика
+     * \param selected - куда
+     * \param deselected - откуда
+     */
     void onStoneSelected(const QItemSelection &selected, const QItemSelection &deselected);
     void swapCells(const QModelIndex& first, const QModelIndex& second);
+    /*!
+     * \brief scanScene - сканирует сцену на предмет стоящих подряд три или более
+     * одинаковых шариков
+     * \param from - ячейка, которую пользователь выбрал для свапа
+     * \param to - ячейка, в которую пользователь выбрал свап
+     * \param clicked - true - кликнул пользователь, false - мы сами заполнили поле
+     */
     void scanScene(const QModelIndex &from = QModelIndex(),
                     const QModelIndex &to = QModelIndex(),
                     bool clicked = true);
+    /*!
+     * \brief deleteMatches - удаление одинаковых шариков
+     * \param columnToDelete - номер строки, (колнка от которой начать удалять, колонка до которой)
+     * \param rowToDelete - номер колонки, (строка от которой надо удалять, строка до которой надо удалять)
+     */
     void deleteMatches(const ColumnToDelete& columnToDelete, const RowToDelete& rowToDelete);
+    /*!
+     * \brief shuffleDown - дроп шариков на свободные ячейки вниз
+     */
     void shuffleDown();
+    /*!
+     * \brief floodFill - заполнение пустых ячеек поля
+     */
     void floodFill();
 private:
     QSharedPointer<QStandardItemModel>  m_model;

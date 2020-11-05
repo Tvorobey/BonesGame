@@ -301,6 +301,7 @@ void GameController::deleteMatches(const ColumnToDelete &columnToDelete, const R
         }
     }
 
+    // Дропнем все шарики вниз
     shuffleDown();
 }
 
