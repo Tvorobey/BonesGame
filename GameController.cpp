@@ -111,6 +111,14 @@ void GameController::onStartGame(int cellCount)
             }
         }
     }
+
+    if (!victoryCheck())
+    {
+        qDebug() << "Сгенерировали так, что нет доступных комбинаций";
+        onStartGame(m_model->rowCount());
+    }
+    else
+        return;
 }
 
 void GameController::onStoneSelected(const QItemSelection &selected, const QItemSelection &deselected)
@@ -384,6 +392,8 @@ void GameController::floodFill()
 //NOTE: тут решение, вроде неплохое, но вот реализация непричесанная, в лоб так сказать
 bool GameController::victoryCheck()
 {
+    qDebug() << "======================================";
+
     // NOTE: когда мы заходим в жту функцию, поле уже очищено от последовательностей шариков
     // от трех и более
     bool result = false;
@@ -391,132 +401,259 @@ bool GameController::victoryCheck()
     // Пробежимся по строчкам и столбцам
     for (int row = 0; row < m_model->rowCount(); ++row)
     {
+        qDebug() << "Row: " << row;
+
         for (int column = 0; column < m_model->columnCount(); ++column)
         {
+            qDebug() << "Column: " << column;
+
             int rowType = m_model->index(column, row).data().toInt();
             int columnType = m_model->index(row, column).data().toInt();
 
+            bool isOk = false;
+
+            m_model->index(row, column + 1).data().toInt(&isOk);
+
             // Два подряд идущих шара в строке
-            if (columnType == m_model->index(row, column + 1).data().toInt())
+            if (isOk)
             {
-                QModelIndex leftColumnIndex = m_model->index(row, column - 2);
-                QModelIndex leftTopIndex    = m_model->index(row - 1, column -1);
-                QModelIndex leftBottomIndex = m_model->index(row + 1, column -1);
+                if (columnType == m_model->index(row, column + 1).data().toInt())
+                {
+                    qDebug() << "Два шарика подряд в строке"<< row << " " << column;
 
-                QModelIndex rightColumnIndex = m_model->index(row, column + 3);
-                QModelIndex rightTopIndex = m_model->index(row - 1, column + 2);
-                QModelIndex rightBottomIndex = m_model->index(row + 1, column + 2);
+                    qDebug() << QString("Шарик в текущей ячейке %1, шарик в подходящей: %2")
+                                .arg(columnType).arg(m_model->index(row, column + 1).data().toInt());
 
-                if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (leftTopIndex.isValid() && (leftTopIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (leftBottomIndex.isValid() && (leftBottomIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
-                }
+                    QModelIndex leftColumnIndex = m_model->index(row, column - 2);
+                    QModelIndex leftTopColumnIndex    = m_model->index(row - 1, column -1);
+                    QModelIndex leftBottomColumnIndex = m_model->index(row + 1, column -1);
 
-                if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (rightTopIndex.isValid() && (rightTopIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (rightBottomIndex.isValid() && (rightBottomIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
+                    QModelIndex rightColumnIndex = m_model->index(row, column + 3);
+                    QModelIndex rightTopColumnIndex = m_model->index(row - 1, column + 2);
+                    QModelIndex rightBottomColumnIndex = m_model->index(row + 1, column + 2);
+
+                    if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("leftColumnIndex row = %1, column = %2")
+                                    .arg(leftColumnIndex.row()).arg(leftColumnIndex.column());
+
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(leftColumnIndex.data().toInt());
+                        result = true;
+                        return result;
+                    }
+                    if (leftTopColumnIndex.isValid() && (leftTopColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("leftTopColumnIndex row = %1, column = %2")
+                                    .arg(leftTopColumnIndex.row()).arg(leftTopColumnIndex.column());
+
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(leftTopColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (leftBottomColumnIndex.isValid() && (leftBottomColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("leftBottomColumnIndex row = %1, column = %2")
+                                    .arg(leftBottomColumnIndex.row()).arg(leftBottomColumnIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(leftBottomColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+
+                    if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("rightColumnIndex row = %1, column = %2")
+                                    .arg(rightColumnIndex.row()).arg(rightColumnIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(rightColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (rightTopColumnIndex.isValid() && (rightTopColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("rightTopColumnIndex row = %1, column = %2")
+                                    .arg(rightTopColumnIndex.row()).arg(rightTopColumnIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(rightTopColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (rightBottomColumnIndex.isValid() && (rightBottomColumnIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("rightBottomColumnIndex row = %1, column = %2")
+                                    .arg(rightBottomColumnIndex.row()).arg(rightBottomColumnIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(rightBottomColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
                 }
             }
 
-            // Два шарика, но которые идут через один в строке
-            if (columnType == m_model->index(row, column + 2).data().toInt())
-            {
-                QModelIndex topRowIndex = m_model->index(row - 1, column + 1);
-                QModelIndex bottomRowIndex = m_model->index(row + 1, column + 1);
+            m_model->index(row, column + 2).data().toInt(&isOk);
 
-                if (topRowIndex.isValid() && (topRowIndex.data().toInt() == columnType))
+            if (isOk)
+            {
+                // Два шарика, но которые идут через один в строке
+                if (columnType == m_model->index(row, column + 2).data().toInt())
                 {
-                    result = true;
-                    return result;
-                }
-                if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == columnType))
-                {
-                    result = true;
-                    return result;
+                    qDebug() << "Два шарика через один в строке"<< row << " " << column;
+
+                    qDebug() << QString("Шарик в текущей ячейке %1, шарик в подходящей: %2")
+                                .arg(columnType).arg(m_model->index(row, column + 2).data().toInt());
+
+                    QModelIndex topRowIndex = m_model->index(row - 1, column + 1);
+                    QModelIndex bottomRowIndex = m_model->index(row + 1, column + 1);
+
+                    if (topRowIndex.isValid() && (topRowIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("topRowIndex row = %1, column = %2")
+                                    .arg(topRowIndex.row()).arg(topRowIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(topRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == columnType))
+                    {
+                        qDebug() << QString("bottomRowIndex row = %1, column = %2")
+                                    .arg(bottomRowIndex.row()).arg(bottomRowIndex.column());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(bottomRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
                 }
             }
 
-            // Два шарика стоят подряд в колонке
-            if (rowType == m_model->index(column + 1, row).data().toInt())
+            m_model->index(column + 1, row).data().toInt(&isOk);
+
+            if (isOk)
             {
-                QModelIndex topRowIndex = m_model->index(column - 2, row);
-                QModelIndex topLeftRowIndex = m_model->index(column - 1, row - 1);
-                QModelIndex topRightRowIndex = m_model->index(column - 1, row + 1);
+                // Два шарика стоят подряд в колонке
+                if (rowType == m_model->index(column + 1, row).data().toInt())
+                {
+                    qDebug() << "Два шарика подряд в колонке"<< column << " " << row;
 
-                QModelIndex bottomRowIndex = m_model->index(column + 3, row);
-                QModelIndex bottomLeftRowIndex = m_model->index(column + 2, row -1);
-                QModelIndex bottomRightIndex = m_model->index(column + 2, row +1);
+                    qDebug() << QString("Шарик в текущей ячейке %1, шарик в подходящей: %2")
+                                .arg(columnType).arg(m_model->index(column + 1, row).data().toInt());
 
-                if (topRowIndex.isValid() && (topRowIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (topLeftRowIndex.isValid() && (topLeftRowIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (topRightRowIndex.isValid() && (topRightRowIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
-                }
+                    QModelIndex topRowIndex = m_model->index(column - 2, row);
+                    QModelIndex topLeftRowIndex = m_model->index(column - 1, row - 1);
+                    QModelIndex topRightRowIndex = m_model->index(column - 1, row + 1);
 
-                if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (bottomLeftRowIndex.isValid() && (bottomLeftRowIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
-                }
-                if (bottomRightIndex.isValid() && (bottomRightIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return result;
+                    QModelIndex bottomRowIndex = m_model->index(column + 3, row);
+                    QModelIndex bottomLeftRowIndex = m_model->index(column + 2, row -1);
+                    QModelIndex bottomRightIndex = m_model->index(column + 2, row +1);
+
+                    if (topRowIndex.isValid() && (topRowIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("topRowIndex row = %1, column = %2")
+                                    .arg(topRowIndex.column()).arg(topRowIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(topRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (topLeftRowIndex.isValid() && (topLeftRowIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("topLeftRowIndex row = %1, column = %2")
+                                    .arg(topLeftRowIndex.column()).arg(topLeftRowIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(topLeftRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (topRightRowIndex.isValid() && (topRightRowIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("topRightRowIndex row = %1, column = %2")
+                                    .arg(topRightRowIndex.column()).arg(topRightRowIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(topRightRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+
+                    if (bottomRowIndex.isValid() && (bottomRowIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("bottomRowIndex row = %1, column = %2")
+                                    .arg(bottomRowIndex.column()).arg(bottomRowIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(bottomRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (bottomLeftRowIndex.isValid() && (bottomLeftRowIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("bottomLeftRowIndex row = %1, column = %2")
+                                    .arg(bottomLeftRowIndex.column()).arg(bottomLeftRowIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(bottomLeftRowIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (bottomRightIndex.isValid() && (bottomRightIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("bottomRightIndex row = %1, column = %2")
+                                    .arg(bottomRightIndex.column()).arg(bottomRightIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(bottomRightIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
                 }
             }
 
-            // В колонке есть два одинаковых шарика, которые стоят через один
-            if (rowType == m_model->index(column, row + 2).data().toInt())
-            {
-                QModelIndex leftColumnIndex = m_model->index(column + 1, row - 1);
-                QModelIndex rightColumnIndex = m_model->index(column + 1, row + 1);
+            m_model->index(column, row + 2).data().toInt(&isOk);
 
-                if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == rowType))
+            if (isOk)
+            {
+                // В колонке есть два одинаковых шарика, которые стоят через один
+                if (rowType == m_model->index(column, row + 2).data().toInt())
                 {
-                    result = true;
-                    return result;
-                }
-                if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == rowType))
-                {
-                    result = true;
-                    return true;
+                    qDebug() << "Два шарика через один в колонке" << column << " " << row;
+
+                    qDebug() << QString("Шарик в текущей ячейке %1, шарик в подходящей: %2")
+                                .arg(columnType).arg(m_model->index(column, row + 2).data().toInt());
+
+                    QModelIndex leftColumnIndex = m_model->index(column + 1, row - 1);
+                    QModelIndex rightColumnIndex = m_model->index(column + 1, row + 1);
+
+                    if (leftColumnIndex.isValid() && (leftColumnIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("leftColumnIndex row = %1, column = %2")
+                                    .arg(leftColumnIndex.column()).arg(leftColumnIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(leftColumnIndex.data().toInt());
+
+                        result = true;
+                        return result;
+                    }
+                    if (rightColumnIndex.isValid() && (rightColumnIndex.data().toInt() == rowType))
+                    {
+                        qDebug() << QString("rightColumnIndex row = %1, column = %2")
+                                    .arg(rightColumnIndex.column()).arg(rightColumnIndex.row());
+                        qDebug() << QString("Тип первого шарика %1, тип подходящего шарика %2")
+                                    .arg(columnType).arg(rightColumnIndex.data().toInt());
+
+                        result = true;
+                        return true;
+                    }
                 }
             }
         }
