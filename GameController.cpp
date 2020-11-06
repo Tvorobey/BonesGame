@@ -105,7 +105,7 @@ void GameController::onStartGame(int cellCount)
                 }
                 else
                 {
-                    quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                    int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
                     m_model->setData(m_model->index(i, j), type, Qt::DisplayRole);
                 }
             }
@@ -244,9 +244,6 @@ void GameController::scanScene(bool clicked, const QModelIndex& from, const QMod
         }
     }
 
-    qDebug() << "Row to delete: " << rowToDelete;
-    qDebug() << "Column to delete: " << columnToDelete;
-
     // Нажатие пользователя
     if (clicked)
     {
@@ -269,7 +266,8 @@ void GameController::scanScene(bool clicked, const QModelIndex& from, const QMod
         {
             if (!victoryCheck())
             {
-                qDebug() << "You loose";
+                qDebug() << "Looze";
+                emit loose();
                 return;
             }
             else
@@ -373,7 +371,7 @@ void GameController::floodFill()
             if (isOk)  continue;
             else
             {
-                quint64 type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
+                int type = QRandomGenerator::securelySeeded().bounded(StoneColor::ColorCount);
 
                 m_model->setData(index, type);
             }

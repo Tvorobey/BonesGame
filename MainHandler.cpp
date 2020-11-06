@@ -28,4 +28,7 @@ MainHandler::MainHandler(QObject *parent)
 
     connect(m_gameController.data(), &GameController::updateScore,
             m_mainWindow.data(), &MainWindow::updateScore);
+
+    connect(m_gameController.data(), &GameController::loose,
+            m_mainWindow.data(), &MainWindow::onLooseGame);
 }

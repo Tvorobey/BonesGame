@@ -10,7 +10,6 @@ CONFIG += c++11
 
 SOURCES += \
     GameController.cpp \
-    HellowPopUp.cpp \
     MainHandler.cpp \
     StoneDelegat.cpp \
     StoneModel.cpp \
@@ -20,14 +19,12 @@ SOURCES += \
 HEADERS += \
     GameController.h \
     Global.h \
-    HellowPopUp.h \
     MainHandler.h \
     StoneDelegat.h \
     StoneModel.h \
     mainwindow.h
 
 FORMS += \
-    HellowPopUp.ui \
     mainwindow.ui
 
 # Default rules for deployment.

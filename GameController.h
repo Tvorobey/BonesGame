@@ -22,6 +22,7 @@ public:
 signals:
     void clearSelection();
     void updateScore(int score);
+    void loose();
 public slots:
     void onStartGame(int cellCount);
     /*!

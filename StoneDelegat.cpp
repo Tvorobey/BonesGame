@@ -22,7 +22,7 @@ void StoneDelegat::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     if (index.data().isValid())
     {
         bool isOk = false;
-        int intType = index.data().toInt(&isOk);
+        index.data().toInt(&isOk);
 
         if (!isOk)  QStyledItemDelegate::paint(painter, option, index);
         else

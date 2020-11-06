@@ -6,58 +6,153 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>865</width>
+    <width>859</width>
     <height>600</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>859</width>
+    <height>600</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Bones</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QTableView" name="gameSceneView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="currentIndex">
+         <number>1</number>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>839</width>
-          <height>300</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>839</width>
-          <height>521</height>
-         </size>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="gridStyle">
-         <enum>Qt::SolidLine</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" alignment="Qt::AlignRight|Qt::AlignBottom">
-       <widget class="QLabel" name="ScoreLable">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
+        <widget class="QWidget" name="gameScene">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QTableView" name="gameSceneView"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="startPage">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="startPageGrid">
+            <item row="0" column="0" alignment="Qt::AlignRight|Qt::AlignTop">
+             <widget class="QLabel" name="label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Введите количество ячеек NxN</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" alignment="Qt::AlignLeft|Qt::AlignTop">
+             <widget class="QSpinBox" name="spinBoxCellsCount">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>13</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+             <widget class="QPushButton" name="btnStartGame">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>13</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">padding: 20px
+</string>
+              </property>
+              <property name="text">
+               <string>Начать игру</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="1" column="0" alignment="Qt::AlignHCenter">
+     <widget class="QLabel" name="scoreLabel">
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -66,7 +161,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>865</width>
+     <width>859</width>
      <height>22</height>
     </rect>
    </property>

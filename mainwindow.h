@@ -5,8 +5,6 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
-//Local
-#include "HellowPopUp.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,11 +24,12 @@ signals:
 public slots:
     void clearSelections();
     void updateScore(int score);
+    void onLooseGame();
 private:
     void createConnection();
+    void prepareUi();
 private:
     Ui::MainWindow *ui;
-    HellowPopUp* popup;
     QSharedPointer<QStandardItemModel>  m_stoneModel;
     QItemSelectionModel*    m_selectionModel;
 };

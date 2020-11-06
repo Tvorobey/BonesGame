@@ -2,22 +2,23 @@
 #include "ui_mainwindow.h"
 #include "StoneDelegat.h"
 
+//Qt
 #include <QDebug>
+#include <QMessageBox>
+
+namespace
+{
+    const int GAME_SCENE_INDEX      = 0;
+    const int HELLOW_WINDOW_INDEX   = 1;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),
-      popup(new HellowPopUp(this))
+    , ui(new Ui::MainWindow)
 {
-    createConnection();
-
     ui->setupUi(this);
-    ui->ScoreLable->setText("Лучший счет: 0");
-    ui->gameSceneView->setItemDelegate(new StoneDelegat());
-
-    ui->gridLayout->addWidget(popup, 0, 0, 0, Qt::AlignCenter);
-
-    popup->show();
+    prepareUi();
+    createConnection();
 }
 
 MainWindow::~MainWindow()
@@ -45,16 +46,51 @@ void MainWindow::clearSelections()
 
 void MainWindow::updateScore(int score)
 {
-    ui->ScoreLable->setText(QString("Лучший счет: %1").arg(score));
+    ui->scoreLabel->setText(QString("Лучший счет: %1").arg(score));
+}
+
+void MainWindow::onLooseGame()
+{
+    qDebug() << "Looooose";
+
+    QMessageBox msgBox;
+    msgBox.setText("Вы проиграли.");
+    msgBox.setInformativeText("Хотите сыграть еще?");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setButtonText(QMessageBox::Ok, "Да!");
+    msgBox.setButtonText(QMessageBox::Cancel, "Нет, усталь");
+
+    msgBox.show();
+
+    switch (msgBox.exec())
+    {
+        case QMessageBox::Ok:
+        {
+            ui->stackedWidget->setCurrentIndex(HELLOW_WINDOW_INDEX);
+        }
+        break;
+        case QMessageBox::Cancel:
+        {
+            QApplication::quit();
+        }
+        break;
+    }
 }
 
 void MainWindow::createConnection()
 {
-    connect(popup, &HellowPopUp::startGame, [this](int cellCount)
+    connect(ui->btnStartGame, &QPushButton::clicked, [this]()
     {
-        popup->hide();
-
-        emit startGame(cellCount);
+        emit startGame(ui->spinBoxCellsCount->text().toInt());
+        ui->stackedWidget->setCurrentIndex(GAME_SCENE_INDEX);
     });
+}
+
+void MainWindow::prepareUi()
+{
+    ui->scoreLabel->setText("Лучший счет: 0");
+    ui->gameSceneView->setItemDelegate(new StoneDelegat());
+
+    ui->spinBoxCellsCount->setRange(4, 100);
 }
 
