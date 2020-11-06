@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 //Qt
 #include <QMainWindow>
@@ -33,4 +32,4 @@ private:
     QSharedPointer<QStandardItemModel>  m_stoneModel;
     QItemSelectionModel*    m_selectionModel;
 };
-#endif // MAINWINDOW_H
+

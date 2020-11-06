@@ -16,7 +16,6 @@ MainHandler::MainHandler(QObject *parent)
 
     connect(m_mainWindow.data(), &MainWindow::startGame, [this](int cellCount)
     {
-        qDebug() << "enter";
         m_gameController->onStartGame(cellCount);
     });
 

@@ -1,5 +1,4 @@
-#ifndef STONEDELEGAT_H
-#define STONEDELEGAT_H
+#pragma once
 
 #include <QStyledItemDelegate>
 
@@ -13,4 +12,4 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
-#endif // STONEDELEGAT_H
+

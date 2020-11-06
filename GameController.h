@@ -1,5 +1,4 @@
-#ifndef GAMECONTROLLER_H
-#define GAMECONTROLLER_H
+#pragma once
 
 //Qt
 #include <QObject>
@@ -62,4 +61,4 @@ private:
     int m_score;
 };
 
-#endif // GAMECONTROLLER_H
+

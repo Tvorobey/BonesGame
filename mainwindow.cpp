@@ -51,8 +51,6 @@ void MainWindow::updateScore(int score)
 
 void MainWindow::onLooseGame()
 {
-    qDebug() << "Looooose";
-
     QMessageBox msgBox;
     msgBox.setText("Вы проиграли.");
     msgBox.setInformativeText("Хотите сыграть еще?");

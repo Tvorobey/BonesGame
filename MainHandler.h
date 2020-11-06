@@ -1,5 +1,4 @@
-#ifndef MAINHANDLER_H
-#define MAINHANDLER_H
+#pragma once
 
 //Qt
 #include <QObject>
@@ -24,4 +23,4 @@ private:
     QSharedPointer<QStandardItemModel>  m_stoneModel;
 };
 
-#endif // MAINHANDLER_H
+

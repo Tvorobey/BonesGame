@@ -12,7 +12,6 @@ SOURCES += \
     GameController.cpp \
     MainHandler.cpp \
     StoneDelegat.cpp \
-    StoneModel.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -21,7 +20,6 @@ HEADERS += \
     Global.h \
     MainHandler.h \
     StoneDelegat.h \
-    StoneModel.h \
     mainwindow.h
 
 FORMS += \
